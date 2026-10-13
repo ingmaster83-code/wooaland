@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  actions: write             # 개월 수가 12·24·36 을 처음 넘으면 deploy.yml 을 실행하기 위해
 
 concurrency:
   group: "land-hist"
@@ -29,6 +30,7 @@ jobs:
       - name: 토지 이력 보강 + 주간 스냅샷(일일 한도 1,000회 안에서)
         run: |
           pip install requests
+          echo "BEFORE=$(ls _rawdata/land_hist/land_*.json.gz _rawdata/land_recent/land_*.json.gz 2>/dev/null | wc -l)" >> "$GITHUB_ENV"
           # 매주 월요일 새벽(UTC 일요일 17:10): 최근 2개월 스냅샷(486회) + 이력 2개월(486회). 그 외 요일: 이력 4개월(약 950회)
           if [ "$(date -u +%u)" = "7" ]; then
             python scripts/fetch_land.py --kind land --mode snapshot-recent
@@ -49,3 +51,16 @@ jobs:
             git pull --rebase origin main
             git push
           fi
+
+      - name: 모인 개월 수가 12·24·36 을 처음 넘으면 사이트 배포 실행
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          AFTER=$(ls _rawdata/land_hist/land_*.json.gz _rawdata/land_recent/land_*.json.gz 2>/dev/null | wc -l)
+          echo "토지 개월 수: $BEFORE → $AFTER"
+          for t in 12 24 36; do
+            if [ "$BEFORE" -lt "$t" ] && [ "$AFTER" -ge "$t" ]; then
+              gh workflow run deploy.yml --ref main
+              break
+            fi
+          done
