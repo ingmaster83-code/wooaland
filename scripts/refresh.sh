@@ -9,8 +9,14 @@ KINDS="nrg indu sh"
 declare -A PID
 for k in $KINDS; do
   (
-    python scripts/fetch_land.py --kind "$k" --mode recent &&
-    python scripts/fetch_land.py --kind "$k" --mode fill-hist
+    # 러너에서 국토부 API 연결이 일시적으로 끊기는 경우(ConnectTimeout)가 있어 종류별로 최대 3회 다시 시도한다(수집은 이어받기·덮어쓰기라 안전)
+    ok=0
+    for i in 1 2 3; do
+      if python scripts/fetch_land.py --kind "$k" --mode recent && python scripts/fetch_land.py --kind "$k" --mode fill-hist; then ok=1; break; fi
+      echo "[$k] 재시도 $i" >&2
+      sleep 60
+    done
+    [ "$ok" = "1" ]
   ) > "data/fetch_$k.log" 2>&1 &
   PID[$k]=$!
 done
