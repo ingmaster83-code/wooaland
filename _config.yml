@@ -1,0 +1,33 @@
+title: 우아땅값 - 토지·상가 실거래가와 땅값 시세
+description: >-
+  동네별 땅값이 평당 얼마인지, 상가·공장·단독주택은 얼마에 거래됐는지 확인하세요.
+  토지·상업업무용·공장창고·단독다가구 매매 실거래가를 동·리별 평당가와 최근 거래로 정리했습니다.
+url: "https://wooaland.wooahouse.com"
+baseurl: ""
+lang: ko
+timezone: Asia/Seoul
+author: WooaHouse
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+plugins:
+  - jekyll-seo-tag
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - scripts/
+  - data/
+  - "*.py"
+  - "*.log"
+  - README.md
+  - .gitignore
+  - .env
+  - vendor/
+
+# 설계 메모: scripts/fetch_land.py 가 국토교통부 토지·상업업무용·공장창고·단독다가구 매매 API를 시군구×월(36개월)로 받아 data/cache 에 쌓고,
+# scripts/process_land.py 가 법정동(읍면동·리) 단위로 집계해 _rawdata/land_{시도}.json 을 만든다(지번이 가려져 있어 필지·건물 페이지는 없음).
+# _plugins/land_generator.rb 가 종류별(토지·상가·공장·주택) 시도·시군구·동 허브, 시군구×지목, 순위 페이지를 생성한다. 사이트맵은 40,000건씩 분할.

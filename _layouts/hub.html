@@ -1,0 +1,167 @@
+---
+layout: default
+---
+
+<div class="page-with-sidebar">
+<div class="region-page">
+
+  <nav class="breadcrumb" aria-label="위치">
+    <a href="/">홈</a>
+    <span>›</span>
+    <a href="/{{ page.k }}/">{{ page.info.name }}</a>
+    <span>›</span>
+    {% if page.level == "do" %}<span>{{ page.doShort }}</span>
+    {% else %}<a href="/{{ page.k }}/{{ page.doShort | uri_escape }}/">{{ page.doShort }}</a>
+    <span>›</span>
+    {% if page.level == "sg" %}<span>{{ page.sigungu }}</span>
+    {% else %}<a href="/{{ page.k }}/{{ page.doShort | uri_escape }}/{{ page.sigungu | uri_escape }}/">{{ page.sigungu }}</a>
+    <span>›</span>
+    <span>{{ page.dong }}</span>{% endif %}{% endif %}
+  </nav>
+
+  <div class="region-page-header">
+    <h1>{{ page.info.icon }} {{ page.place }} {{ page.info.title }}{% unless page.level == "do" %} ({{ page.latest | slice: 0, 4 }}){% endunless %}</h1>
+    <p>{{ page.info.long }} · 최근 36개월 {{ page.n }}건{% unless page.level == "do" %} · 최근 12개월 {{ page.n12 }}건{% endunless %}</p>
+  </div>
+
+  {% unless page.level == "do" %}
+  <div class="ratio-box {% if page.hasChg %}{% if page.up %}ratio-warn{% else %}ratio-ok{% endif %}{% endif %}">
+    <div class="ratio-num" style="font-size:1.6rem;min-width:170px;">{{ page.med }}</div>
+    <div class="ratio-txt">
+      <b>최근 12개월 평당 가격 (중앙값)</b>
+      ㎡당 약 {{ page.medSqm }}만원 · 거래금액 중앙값 {{ page.mp }}{% if page.hasChg %} · 직전 12개월 대비 <strong>{{ page.chg }}</strong>{% endif %}
+    </div>
+  </div>
+  {% endunless %}
+
+  <p class="summary-p">{{ page.summary }}</p>
+
+  <div class="info-box">
+    ℹ️ 국토교통부 실거래가 신고 자료를 <b>법정동(읍면동·리)</b> 단위로 집계했습니다. 지번은 공개 자료에서 일부가 가려져 있고, 평당가는 지분·해제 거래와 비시장 지목을 제외한 중앙값입니다. (최근 거래 반영: {{ page.latest }})
+  </div>
+
+  <div class="ad-slot">
+    {% include ad.html %}
+  </div>
+
+  {% if page.level == "do" %}
+  <p style="margin:8px 0 16px;"><a class="fr-map" href="{{ page.rankUrl }}" style="display:inline-block;padding:9px 14px;">🏆 {{ page.doShort }} {{ page.info.title }} 순위 →</a></p>
+  <h2 class="group-title">📍 시군구별 {{ page.info.title }}</h2>
+  <div class="tbl-wrap"><table class="trade-tbl">
+    <thead><tr><th>시군구</th><th>거래(36개월)</th><th>거래(12개월)</th><th>평당가 중앙값</th><th>거래금액 중앙값</th><th>직전 12개월 대비</th></tr></thead>
+    <tbody>{% for s in page.sgRows %}<tr><td><a href="{{ s.url }}">{{ s.name }}</a></td><td>{{ s.n }}건</td><td>{{ s.n12 }}건</td><td>{{ s.med }}</td><td>{{ s.mp }}</td><td class="{% if s.up %}chg-up{% else %}chg-down{% endif %}">{{ s.chg }}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+  {% else %}
+
+  <h2 class="group-title">📈 기간별 평당가 변화</h2>
+  <div class="tbl-wrap"><table class="trade-tbl">
+    <thead><tr><th>기간</th><th>거래</th><th>평당가 중앙값</th><th>이전 기간 대비</th></tr></thead>
+    <tbody>{% for w in page.wRows %}<tr><td>{{ w.name }}<br><small style="color:#6B7280;">{{ w.period }}</small></td><td>{{ w.n }}건</td><td><b>{{ w.med }}</b></td><td class="{% if w.up %}chg-up{% else %}chg-down{% endif %}">{{ w.chg }}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+
+  {% if page.level == "dong" and page.vsSg %}
+  <p style="color:#374151;font-size:.9rem;margin-top:10px;">{{ page.sigungu }} 전체 평당가 중앙값({{ page.sgMed }})의 <strong>{{ page.vsSg }}%</strong> 수준입니다.</p>
+  {% endif %}
+
+  <h2 class="group-title">🏷️ {{ page.info.tl }}별 시세</h2>
+  <div class="tbl-wrap"><table class="trade-tbl">
+    <thead><tr><th>{{ page.info.tl }}</th><th>거래</th><th>평당가 중앙값</th><th>면적 중앙값(㎡)</th><th>거래금액 중앙값</th></tr></thead>
+    <tbody>{% for t in page.tRows %}<tr><td>{{ t.ty }}</td><td>{{ t.n }}건</td><td>{{ t.py }}</td><td>{{ t.a }}</td><td>{{ t.amt }}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+
+  {% if page.zones.size > 0 %}
+  <div class="chip-row" style="margin-top:10px;">
+    <span style="color:#6B7280;font-size:.85rem;margin-right:4px;">주요 용도지역</span>
+    {% for z in page.zones %}<span class="chip">{{ z.z }}<em>{{ z.n }}건</em></span>{% endfor %}
+  </div>
+  {% endif %}
+
+  {% if page.corp %}
+  <p style="color:#374151;font-size:.9rem;margin-top:10px;">거래 상대 중 법인 비율 <strong>{{ page.corp }}%</strong>, 집합건물 비율 <strong>{{ page.unit }}%</strong>{% if page.age > 0 %}, 건물 연식 중앙값 <strong>{{ page.age }}년</strong>{% endif %}입니다.</p>
+  {% elsif page.age > 0 %}
+  <p style="color:#374151;font-size:.9rem;margin-top:10px;">거래된 주택의 건물 연식 중앙값은 <strong>{{ page.age }}년</strong>입니다.</p>
+  {% endif %}
+
+  {% if page.level == "sg" %}
+    {% if page.jimoks.size > 0 %}
+    <h2 class="group-title">🌾 지목별 시세 바로가기</h2>
+    <div class="chip-row">
+      {% for j in page.jimoks %}<a class="chip" href="{{ j.url }}">{{ j.label }}<em>{{ j.med }}</em></a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+<!-- ad2 -->
+    <div class="ad-slot">
+      {% include ad.html %}
+    </div>
+
+    {% if page.dongRows.size > 0 %}
+    <h2 class="group-title">📍 {{ page.sigungu }} 동·리별 {{ page.info.title }} <small style="font-weight:500;color:#6B7280;">(거래 많은 순{% if page.nDongs > 250 %}, 상위 250곳{% endif %})</small></h2>
+    <div class="tbl-wrap"><table class="trade-tbl">
+      <thead><tr><th>동·리</th><th>거래(36개월)</th><th>거래(12개월)</th><th>평당가 중앙값</th><th>거래금액 중앙값</th><th>직전 12개월 대비</th></tr></thead>
+      <tbody>{% for d in page.dongRows %}<tr><td><a href="{{ d.url }}">{{ d.name }}</a></td><td>{{ d.n }}건</td><td>{{ d.n12 }}건</td><td>{{ d.med }}</td><td>{{ d.mp }}</td><td class="{% if d.up %}chg-up{% else %}chg-down{% endif %}">{{ d.chg }}</td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+    {% endif %}
+
+    {% if page.top.size > 0 %}
+    <h2 class="group-title">💎 최근 12개월 고가 거래 TOP {{ page.top.size }}</h2>
+    <div class="tbl-wrap"><table class="trade-tbl">
+      <thead><tr><th>계약일</th><th>동·리</th><th>{{ page.info.tl }}</th><th>면적(㎡)</th><th>거래금액</th><th>평당가</th><th>지번</th></tr></thead>
+      <tbody>{% for t in page.top %}<tr><td>{{ t.d }}</td><td>{{ t.dg }}</td><td>{{ t.ty }}</td><td>{{ t.a }}</td><td>{{ t.amt }}</td><td>{{ t.py }}</td><td>{{ t.jb }}</td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+    {% endif %}
+  {% endif %}
+
+  {% if page.tRecent.size > 0 %}
+  <h2 class="group-title">🧾 최근 거래 내역</h2>
+  <div class="tbl-wrap"><table class="trade-tbl">
+    <thead><tr><th>계약일</th>{% if page.level == "sg" %}<th>동·리</th>{% endif %}<th>{{ page.info.tl }}</th><th>면적(㎡)</th>{% if page.k != "land" %}<th>대지(㎡)</th>{% endif %}<th>거래금액</th><th>평당가</th><th>지번</th>{% if page.k != "house" %}<th>용도지역</th>{% endif %}<th>거래</th></tr></thead>
+    <tbody>{% for t in page.tRecent %}<tr><td>{{ t.d }}</td>{% if page.level == "sg" %}<td>{{ t.dg }}</td>{% endif %}<td>{{ t.ty }}</td><td>{{ t.a }}</td>{% if page.k != "land" %}<td>{{ t.a2 }}</td>{% endif %}<td>{{ t.amt }}</td><td>{{ t.py }}</td><td>{{ t.jb }}</td>{% if page.k != "house" %}<td>{{ t.zone }}</td>{% endif %}<td>{{ t.gbn }}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+  {% endif %}
+
+  {% endif %}
+
+{% unless page.level == "sg" %}
+<!-- ad2 -->
+  <div class="ad-slot">
+    {% include ad.html %}
+  </div>
+{% endunless %}
+
+  {% if page.level == "dong" and page.neighbors.size > 0 %}
+  <h2 class="group-title">📍 {{ page.sigungu }}의 다른 동·리</h2>
+  <ul class="food-list">
+    {% for t in page.neighbors %}<li class="food-row"><div class="fr-main"><b><a href="{{ t.url }}" style="color:inherit;">{{ t.name }}</a></b><small>거래 {{ t.n }}건 · 평당가 {{ t.med }}</small></div><a class="fr-map" href="{{ t.url }}">보기</a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if page.others.size > 0 %}
+  <div class="chip-row" style="margin-top:14px;">
+    <span style="color:#6B7280;font-size:.85rem;margin-right:4px;">{{ page.place }} 다른 시세</span>
+    {% for o in page.others %}<a class="chip" href="{{ o.url }}">{{ o.name }}</a>{% endfor %}
+  </div>
+  {% endif %}
+
+  {% include faq.html %}
+
+  <div class="tip-box">
+    <h2>{{ page.place }} 부동산 더 알아보기</h2>
+    <p>평당가는 입지·용도·모양에 따라 같은 지역 안에서도 크게 달라집니다. 거래 전에는 등기부등본, 토지이용계획, 감정평가 등으로 개별 물건을 확인하세요.</p>
+    {% unless page.level == "do" %}
+    <p class="hub-links" style="margin-top:10px;"><a href="{{ page.aaptUrl }}">{{ page.place }} 아파트 실거래가 →</a> <a href="{{ page.villaUrl }}">빌라·오피스텔 →</a> <a href="{{ page.gongsiUrl }}">공시가격 →</a> <a href="{{ page.hakUrl }}">학군 →</a></p>
+    {% endunless %}
+    <p class="hub-links" style="margin-top:10px;"><a href="/rank/{{ page.k }}/">{{ page.info.title }} 순위 →</a> <a href="/guide/">실거래가 보는 법 →</a></p>
+  </div>
+
+</div>
+<aside class="tool-sidebar"></aside>
+</div>

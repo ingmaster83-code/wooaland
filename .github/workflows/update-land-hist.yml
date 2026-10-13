@@ -1,0 +1,51 @@
+name: 토지 실거래 이력 보강
+
+# 토지 매매 API 는 일일 호출 한도가 1,000회라 36개월(8,748회)을 한 번에 못 받는다.
+# 매일 새벽 할당량(약 950회 ≈ 4개월)만큼 확정 월 이력(_rawdata/land_hist)을 채우고, 매주 최근 2개월 스냅샷(_rawdata/land_recent)을 갱신해 커밋한다.
+# 이력이 다 채워지면 이력 호출은 0회가 된다. 배포(deploy.yml)는 토지 API 를 호출하지 않고 이 이력·스냅샷을 쓴다.
+on:
+  schedule:
+    - cron: '10 17 * * *'    # 매일 02:10 KST (일일 한도 초기화 직후)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "land-hist"
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 토지 이력 보강 + 주간 스냅샷(일일 한도 1,000회 안에서)
+        run: |
+          pip install requests
+          # 매주 월요일 새벽(UTC 일요일 17:10): 최근 2개월 스냅샷(486회) + 이력 2개월(486회). 그 외 요일: 이력 4개월(약 950회)
+          if [ "$(date -u +%u)" = "7" ]; then
+            python scripts/fetch_land.py --kind land --mode snapshot-recent
+            python scripts/fetch_land.py --kind land --mode fill-hist --max-calls 480
+          else
+            python scripts/fetch_land.py --kind land --mode fill-hist --max-calls 950
+          fi
+        env:
+          DATA_GO_KR_API_KEY: ${{ secrets.DATA_GO_KR_API_KEY }}
+
+      - name: 이력 커밋
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add _rawdata/land_hist _rawdata/land_recent
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: 토지 실거래 이력 보강 $(date +'%Y-%m-%d')"
+            git pull --rebase origin main
+            git push
+          fi

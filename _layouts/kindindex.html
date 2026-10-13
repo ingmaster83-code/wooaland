@@ -1,0 +1,57 @@
+---
+layout: default
+---
+
+<div class="page-with-sidebar">
+<div class="region-page">
+
+  <nav class="breadcrumb" aria-label="위치">
+    <a href="/">홈</a>
+    <span>›</span>
+    <span>{{ page.info.name }}</span>
+  </nav>
+
+  <div class="region-page-header">
+    <h1>{{ page.info.icon }} 전국 {{ page.info.title }} ({{ page.latest | slice: 0, 4 }})</h1>
+    <p>{{ page.info.long }} · 최근 36개월 {{ page.n }}건</p>
+  </div>
+
+  <p class="summary-p">{{ page.summary }}</p>
+
+  <div class="ad-slot">
+    {% include ad.html %}
+  </div>
+
+  <h2 class="group-title">📍 시도별로 찾기</h2>
+  <div class="region-grid">
+    {% for d in page.doRows %}<a href="/{{ page.k }}/{{ d.name | uri_escape }}/" class="region-btn"><span class="region-icon">{{ page.info.icon }}</span>{{ d.name }}
+      <div class="region-count">{{ d.n }}건 · {{ d.sg }}개 시군구</div></a>
+    {% endfor %}
+  </div>
+
+  <h2 class="group-title">🏆 평당가가 높은 시군구</h2>
+  <ul class="food-list">
+    {% for t in page.top %}<li class="food-row"><div class="fr-main"><b><a href="{{ t.url }}" style="color:inherit;">{{ t.name }}</a></b><small>평당 {{ t.med }} · 거래 {{ t.n }}건</small></div><a class="fr-map" href="{{ t.url }}">보기</a></li>
+    {% endfor %}
+  </ul>
+
+<!-- ad2 -->
+  <div class="ad-slot">
+    {% include ad.html %}
+  </div>
+
+  <h2 class="group-title">🔥 거래가 많은 시군구</h2>
+  <ul class="food-list">
+    {% for t in page.busy %}<li class="food-row"><div class="fr-main"><b><a href="{{ t.url }}" style="color:inherit;">{{ t.name }}</a></b><small>거래 {{ t.n }}건 · 평당 {{ t.med }}</small></div><a class="fr-map" href="{{ t.url }}">보기</a></li>
+    {% endfor %}
+  </ul>
+
+  <div class="tip-box">
+    <h2>{{ page.info.name }} 실거래가를 볼 때</h2>
+    <p>지번이 일부 가려진 공개 자료라 개별 물건이 아니라 동·리 단위 통계로 정리했습니다. 평당가는 지분·해제 거래와 비시장 지목을 제외한 중앙값입니다.</p>
+    <p class="hub-links" style="margin-top:10px;"><a href="/rank/{{ page.k }}/">{{ page.info.title }} 순위 →</a> <a href="/guide/">실거래가 보는 법 →</a></p>
+  </div>
+
+</div>
+<aside class="tool-sidebar"></aside>
+</div>

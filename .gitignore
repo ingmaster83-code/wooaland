@@ -1,0 +1,13 @@
+.env
+_site/
+.jekyll-cache/
+Gemfile.lock
+
+# 수집 캐시·로그(로컬 전용, 용량 큼)
+data/
+
+# 가공 산출물(빌드마다 scripts/process_land.py 가 재생성) — 확정 월 이력 _rawdata/land_hist/ 만 커밋한다
+_rawdata/land_*.json
+!_rawdata/land_hist/
+*.pyc
+__pycache__/

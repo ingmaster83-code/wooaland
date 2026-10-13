@@ -1,0 +1,92 @@
+---
+layout: default
+---
+
+<div class="page-with-sidebar">
+<div class="region-page">
+
+  <nav class="breadcrumb" aria-label="위치">
+    <a href="/">홈</a>
+    <span>›</span>
+    <a href="/land/">땅값</a>
+    <span>›</span>
+    <a href="/land/{{ page.doShort | uri_escape }}/">{{ page.doShort }}</a>
+    <span>›</span>
+    <a href="{{ page.hubUrl }}">{{ page.sigungu }}</a>
+    <span>›</span>
+    <span>{{ page.label }}</span>
+  </nav>
+
+  <div class="region-page-header">
+    <h1>🌾 {{ page.place }} {{ page.label }} 시세 ({{ page.latest | slice: 0, 4 }})</h1>
+    <p>{{ page.label }} 매매 실거래가 · 최근 36개월 {{ page.n }}건 · 최근 12개월 {{ page.n12 }}건</p>
+  </div>
+
+  <div class="ratio-box">
+    <div class="ratio-num" style="font-size:1.6rem;min-width:170px;">{{ page.med }}</div>
+    <div class="ratio-txt">
+      <b>최근 12개월 평당 가격 (중앙값)</b>
+      ㎡당 약 {{ page.medSqm }}만원 · 거래금액 중앙값 {{ page.mp }}
+    </div>
+  </div>
+
+  <p class="summary-p">{{ page.summary }}</p>
+
+  <div class="info-box">
+    ℹ️ 지분 거래·해제 거래를 제외한 {{ page.label }} 매매 신고 자료의 중앙값입니다. 지번은 공개 자료에서 일부가 가려져 있습니다. (최근 거래 반영: {{ page.latest }})
+  </div>
+
+  <div class="ad-slot">
+    {% include ad.html %}
+  </div>
+
+  <h2 class="group-title">📈 기간별 평당가 변화</h2>
+  <div class="tbl-wrap"><table class="trade-tbl">
+    <thead><tr><th>기간</th><th>거래</th><th>평당가 중앙값</th><th>이전 기간 대비</th></tr></thead>
+    <tbody>{% for w in page.wRows %}<tr><td>{{ w.name }}<br><small style="color:#6B7280;">{{ w.period }}</small></td><td>{{ w.n }}건</td><td><b>{{ w.med }}</b></td><td class="{% if w.up %}chg-up{% else %}chg-down{% endif %}">{{ w.chg }}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+
+  {% if page.dl.size > 0 %}
+  <h2 class="group-title">📍 {{ page.label }} 거래가 많은 동·리</h2>
+  <div class="tbl-wrap"><table class="trade-tbl">
+    <thead><tr><th>동·리</th><th>거래(36개월)</th><th>평당가 중앙값</th></tr></thead>
+    <tbody>{% for d in page.dl %}<tr><td><a href="{{ d.url }}">{{ d.name }}</a></td><td>{{ d.n }}건</td><td>{{ d.med }}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+  {% endif %}
+
+<!-- ad2 -->
+  <div class="ad-slot">
+    {% include ad.html %}
+  </div>
+
+  {% if page.zones.size > 0 %}
+  <div class="chip-row" style="margin-top:10px;">
+    <span style="color:#6B7280;font-size:.85rem;margin-right:4px;">주요 용도지역</span>
+    {% for z in page.zones %}<span class="chip">{{ z.z }}<em>{{ z.n }}건</em></span>{% endfor %}
+  </div>
+  {% endif %}
+
+  <h2 class="group-title">🧾 최근 거래 내역</h2>
+  <div class="tbl-wrap"><table class="trade-tbl">
+    <thead><tr><th>계약일</th><th>동·리</th><th>면적(㎡)</th><th>거래금액</th><th>평당가</th><th>지번</th><th>용도지역</th><th>거래</th></tr></thead>
+    <tbody>{% for t in page.tRecent %}<tr><td>{{ t.d }}</td><td>{{ t.dg }}</td><td>{{ t.a }}</td><td>{{ t.amt }}</td><td>{{ t.py }}</td><td>{{ t.jb }}</td><td>{{ t.zone }}</td><td>{{ t.gbn }}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+
+  {% include faq.html %}
+
+  <div class="tip-box">
+    <h2>{{ page.label }} 거래 전에 확인하세요</h2>
+    <ul>
+      <li>토지이용계획확인서로 <strong>용도지역·개발 제한</strong>을 먼저 확인하세요. 같은 지목이라도 용도지역에 따라 가격이 크게 달라집니다.</li>
+      <li>진입 도로와 맹지 여부, 경사·모양, 인근 개발 계획이 가격에 큰 영향을 줍니다.</li>
+      <li>농지(전·답)는 취득자격증명 등 별도 요건이 있을 수 있습니다.</li>
+    </ul>
+    <p class="hub-links" style="margin-top:10px;"><a href="{{ page.hubUrl }}">{{ page.sigungu }} 땅값 전체 →</a> <a href="/rank/land/">땅값 순위 →</a> <a href="/guide/">실거래가 보는 법 →</a></p>
+  </div>
+
+</div>
+<aside class="tool-sidebar"></aside>
+</div>

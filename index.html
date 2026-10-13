@@ -1,0 +1,105 @@
+---
+layout: default
+title: 우아땅값 - 토지·상가 실거래가와 동네별 땅값 시세 (평당가)
+description: 우리 동네 땅값이 평당 얼마인지, 상가·공장·단독주택은 얼마에 거래됐는지 확인하세요. 토지·상업업무용·공장창고·단독다가구 매매 실거래가를 동·리별 평당가와 최근 거래로 정리했습니다.
+---
+
+<div class="hero">
+  <h1>우아땅값 · 🌱 땅값·상가 시세</h1>
+  <p>동네 이름으로 검색해 보세요 (예: 삼성동, 해운대구, 양평군)</p>
+  <div class="search-wrap">
+    <input type="text" id="searchInput" class="search-input"
+           placeholder="예) 삼성동, 평택시, 양평군..."
+           autocomplete="off" aria-label="동네 검색">
+    <button class="search-btn" onclick="doSearch()">🔍 검색</button>
+  </div>
+</div>
+
+<div class="page-with-sidebar">
+<div>
+<div id="search-results"></div>
+
+<div class="top-ad-bar">
+  {% include ad.html %}
+</div>
+
+<div class="section" style="padding-bottom:0;">
+  <div class="info-box">
+    💡 국토교통부 실거래가 신고 자료에서 <strong>토지·상가·공장창고·단독주택</strong> 매매를 법정동(읍면동·리) 단위로 정리했습니다. 평당가는 지분·해제 거래를 뺀 중앙값이고, 최근 거래 반영일은 {{ site.data.land_stats.latest }}입니다.
+  </div>
+</div>
+
+<div class="section">
+  <h2 class="section-title">🔎 무엇이 궁금하세요?</h2>
+  <div class="region-grid">
+    {% for kd in site.data.land_stats.kinds %}<a href="/{{ kd.k }}/" class="region-btn"><span class="region-icon">{{ kd.icon }}</span>{{ kd.title }}
+      <div class="region-count">{{ kd.long }} · {{ kd.n }}건</div></a>
+    {% endfor %}
+  </div>
+</div>
+
+{% for kd in site.data.land_stats.kinds %}
+<div class="section">
+  <h2 class="section-title">{{ kd.icon }} {{ kd.title }} 높은 지역 <small style="font-weight:500;color:#6B7280;">({{ kd.name }})</small></h2>
+  <ul class="food-list">
+    {% for t in kd.top %}<li class="food-row"><div class="fr-main"><b><a href="{{ t.url }}" style="color:inherit;">{{ t.name }}</a></b><small>평당 {{ t.med }} · 거래 {{ t.n }}건</small></div><a class="fr-map" href="{{ t.url }}">보기</a></li>
+    {% endfor %}
+  </ul>
+  <p class="hub-links" style="margin-top:10px;"><a href="/{{ kd.k }}/">{{ kd.name }} 전체 지역 →</a> <a href="/rank/{{ kd.k }}/">{{ kd.title }} 순위 →</a></p>
+</div>
+{% if forloop.index == 2 %}
+<div class="top-ad-bar">
+  {% include ad.html %}
+</div>
+{% endif %}
+{% endfor %}
+
+<div class="section">
+  <h2 class="section-title">✅ 실거래가를 볼 때 알아두세요</h2>
+  <ul style="color:#374151;line-height:1.9;font-size:.93rem;padding-left:22px;">
+    <li>공개 자료의 <strong>지번은 일부가 가려져</strong>(예: 4**) 있어 개별 필지가 아니라 동·리 단위 통계로 보여줍니다.</li>
+    <li>평당가는 거래금액을 면적(평)으로 나눈 <strong>중앙값</strong>이며, 거래가 적은 동네는 한두 건에 좌우됩니다. 거래 건수를 함께 보세요.</li>
+    <li>토지는 용도지역·진입도로·모양에 따라 같은 동네에서도 가격 차이가 큽니다. 거래 전 <strong>토지이용계획과 등기부등본</strong>을 꼭 확인하세요.</li>
+  </ul>
+  <p style="margin-top:12px;"><a href="/guide/">실거래가 보는 법 자세히 →</a></p>
+</div>
+
+</div>
+<aside class="tool-sidebar"></aside>
+</div>
+
+<script>
+let items = null;
+async function loadIndex() {
+  if (items) return;
+  const resp = await fetch('/search_index.json');
+  items = await resp.json();
+  items.forEach(f => { f.h = (f.n + ' ' + f.l + ' ' + f.t).toLowerCase(); });
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  const el = document.getElementById('search-results');
+  if (!q) { el.innerHTML = ''; return; }
+  el.innerHTML = '<p style="text-align:center;padding:20px;color:#6B7280;">검색 중...</p>';
+  loadIndex().then(() => {
+    const toks = q.toLowerCase().split(/\s+/).filter(Boolean);
+    const results = [];
+    for (const f of items) {
+      if (toks.every(t => f.h.includes(t))) { results.push(f); if (results.length >= 40) break; }
+    }
+    if (results.length === 0) {
+      el.innerHTML = '<p style="text-align:center;padding:20px;color:#6B7280;">검색 결과가 없습니다.</p>';
+      return;
+    }
+    el.innerHTML = `<div style="max-width:960px;margin:0 auto;padding:0 20px;">
+      <p style="padding:8px 0;font-size:.9rem;color:#6B7280;">"${esc(q)}" 검색 결과 ${results.length}${results.length >= 40 ? '+' : ''}개</p>
+      <ul class="office-list">${results.map(f => `<li><a href="${f.u}"><b>${esc(f.n)}</b><small>${esc(f.t)} · ${esc(f.l)}</small></a></li>`).join('')}</ul>
+    </div>`;
+    el.scrollIntoView({ behavior: 'smooth' });
+  });
+}
+document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+const urlQ = new URLSearchParams(location.search).get('q');
+if (urlQ) { document.getElementById('searchInput').value = urlQ; doSearch(); }
+</script>

@@ -1,0 +1,95 @@
+---
+layout: default
+---
+
+<div class="page-with-sidebar">
+<div class="region-page">
+
+  <nav class="breadcrumb" aria-label="위치">
+    <a href="/">홈</a>
+    <span>›</span>
+    {% if page.index %}<span>순위</span>
+    {% else %}<a href="/rank/">순위</a>
+    <span>›</span>
+    <span>{{ page.scope }} {{ page.info.title }}</span>{% endif %}
+  </nav>
+
+  {% if page.index %}
+  <div class="region-page-header">
+    <h1>🏆 땅값·상가 시세 순위</h1>
+    <p>평당가 높은 지역과 최고가 거래 · 최근 36개월 신고 기준</p>
+  </div>
+
+  <div class="ad-slot">
+    {% include ad.html %}
+  </div>
+
+  <div class="region-grid">
+    {% for kd in page.kinds %}<a href="/rank/{{ kd.k }}/" class="region-btn"><span class="region-icon">{{ kd.icon }}</span>{{ kd.title }} 순위
+      <div class="region-count">{{ kd.long }}</div></a>
+    {% endfor %}
+  </div>
+
+<!-- ad2 -->
+  <div class="ad-slot">
+    {% include ad.html %}
+  </div>
+
+  {% else %}
+  <div class="region-page-header">
+    <h1>🏆 {{ page.scope }} {{ page.info.title }} 순위 ({{ page.latest | slice: 0, 4 }})</h1>
+    <p>{{ page.info.long }} · 평당가 중앙값 기준</p>
+  </div>
+
+  <p class="summary-p">{{ page.summary }}</p>
+
+  <div class="ad-slot">
+    {% include ad.html %}
+  </div>
+
+  {% if page.sgRows.size > 0 %}
+  <h2 class="group-title">📍 {{ page.scope }} 시군구 평당가 순위</h2>
+  <div class="tbl-wrap"><table class="trade-tbl">
+    <thead><tr><th>순위</th><th>시군구</th><th>거래(36개월)</th><th>평당가 중앙값</th><th>거래금액 중앙값</th></tr></thead>
+    <tbody>{% for s in page.sgRows %}<tr><td>{{ s.rank }}</td><td><a href="{{ s.url }}">{{ s.name }}</a></td><td>{{ s.n }}건</td><td><b>{{ s.med }}</b></td><td>{{ s.mp }}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+  {% endif %}
+
+<!-- ad2 -->
+  <div class="ad-slot">
+    {% include ad.html %}
+  </div>
+
+  {% if page.dongRows.size > 0 %}
+  <h2 class="group-title">📍 {{ page.scope }} 동·리 평당가 순위 <small style="font-weight:500;color:#6B7280;">(거래 8건 이상)</small></h2>
+  <div class="tbl-wrap"><table class="trade-tbl">
+    <thead><tr><th>순위</th><th>동·리</th><th>거래(36개월)</th><th>평당가 중앙값</th></tr></thead>
+    <tbody>{% for d in page.dongRows %}<tr><td>{{ d.rank }}</td><td><a href="{{ d.url }}">{{ d.name }}</a></td><td>{{ d.n }}건</td><td><b>{{ d.med }}</b></td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+  {% endif %}
+
+  {% if page.tops.size > 0 %}
+  <h2 class="group-title">💎 최근 12개월 고가 거래 TOP {{ page.tops.size }}</h2>
+  <div class="tbl-wrap"><table class="trade-tbl">
+    <thead><tr><th>계약일</th><th>위치</th><th>{{ page.info.tl }}</th><th>면적(㎡)</th><th>거래금액</th><th>평당가</th><th>지번</th></tr></thead>
+    <tbody>{% for t in page.tops %}<tr><td>{{ t.d }}</td><td>{{ t.loc }}</td><td>{{ t.ty }}</td><td>{{ t.a }}</td><td>{{ t.amt }}</td><td>{{ t.py }}</td><td>{{ t.jb }}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+  {% endif %}
+
+  <div class="tip-box">
+    <h2>순위를 볼 때</h2>
+    <ul>
+      <li>평당가는 지분 거래·해제 거래·비시장 지목을 제외한 중앙값이며, 거래 건수가 적은 지역은 순위에서 제외했습니다.</li>
+      <li>고가 거래는 대형 물건 한두 건이 포함된 경우가 많아 지역의 일반적인 시세와 다를 수 있습니다.</li>
+      <li>지번은 공개 자료에서 일부가 가려져 있어 정확한 위치는 공식 실거래가 공개시스템에서 확인하세요.</li>
+    </ul>
+    <p class="hub-links" style="margin-top:10px;"><a href="/rank/">다른 순위 →</a> <a href="/{{ page.k }}/{% if page.doShort %}{{ page.doShort | uri_escape }}/{% endif %}">{{ page.scope }} {{ page.info.title }} →</a></p>
+  </div>
+  {% endif %}
+
+</div>
+<aside class="tool-sidebar"></aside>
+</div>

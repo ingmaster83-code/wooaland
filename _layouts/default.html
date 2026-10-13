@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if page.url == '/' %}{{ page.title }}{% elsif page.title %}{{ page.title }} | 우아땅값{% else %}우아땅값 - 토지·상가 실거래가와 땅값 시세{% endif %}</title>
+  <meta name="description" content="{% if page.description %}{{ page.description | escape }}{% else %}{{ site.description | strip_newlines | escape }}{% endif %}">
+  <meta name="naver-site-verification" content="0ffddc42cb8dcc4347ed3d259c978c4137e3c38b" />
+  <link rel="canonical" href="{{ page.url | absolute_url }}">
+
+  <meta property="og:type" content="{% if page.layout == 'complex' %}article{% else %}website{% endif %}">
+  <meta property="og:title" content="{% if page.url == '/' %}{{ page.title | escape }}{% elsif page.title %}{{ page.title | escape }} | 우아땅값{% else %}우아땅값 - 토지·상가 실거래가와 땅값 시세{% endif %}">
+  <meta property="og:description" content="{% if page.description %}{{ page.description | escape }}{% else %}{{ site.description | strip_newlines | escape }}{% endif %}">
+  <meta property="og:image" content="{{ '/assets/og-image.png' | absolute_url }}">
+  <meta property="og:url" content="{{ page.url | absolute_url }}">
+  <meta property="og:site_name" content="우아땅값">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9ZGENFSXWC"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-9ZGENFSXWC');</script>
+
+  <!-- AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6464921081676309" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="{{ '/' | relative_url }}" class="site-logo">
+      <span class="logo-icon">🌱</span>
+      <span class="logo-text">우아땅값</span>
+    </a>
+    <nav class="header-nav">
+      {% for kd in site.data.land_stats.kinds %}<a href="/{{ kd.k }}/">{{ kd.short }}</a>
+      {% endfor %}
+      <a href="{{ '/rank/' | relative_url }}">랭킹</a>
+      <a href="{{ '/search/' | relative_url }}">검색</a>
+      <a href="https://wooahouse.com">WooaHouse →</a>
+    </nav>
+  </div>
+</header>
+
+<script src="{{ '/assets/js/wooa-sites-bar.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/ad-dev-placeholder.js' | relative_url }}"></script>
+
+{% unless page.layout == 'hub' or page.layout == 'jimok' or page.layout == 'rank' or page.layout == 'kindindex' or page.url == '/' %}
+<div class="top-ad-bar">
+  {% include ad.html %}
+</div>
+{% endunless %}
+
+<main class="site-main">
+  {{ content }}
+</main>
+<script src="{{ '/assets/js/wooa-sidebar.js' | relative_url }}"></script>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p class="footer-disclaimer">
+      거래 금액·면적은 국토교통부 실거래가 신고 자료(공공데이터포털: 토지·상업업무용·공장창고·단독다가구 매매)를 법정동(읍면동·리) 단위로 집계한 것입니다. 지번은 공개 자료에서 일부가 가려져 있어 개별 필지·건물은 특정하지 않습니다.<br>
+      평당가는 지분 거래·해제 거래·도로 등 비시장 지목을 제외한 거래금액 ÷ 면적(평)의 중앙값이며, 거래가 적은 지역은 실제와 차이가 큽니다. 투자·거래 판단의 근거가 아니며 매매 전 등기부등본과 감정평가 등으로 확인하세요.
+    </p>
+    <p class="footer-links">
+      <a href="https://wooahouse.com">WooaHouse</a> ·
+      <a href="https://wooaapt.wooahouse.com">우아아파트</a> ·
+      <a href="https://wooahakgun.wooahouse.com">우아학군</a> ·
+      <a href="https://wooavilla.wooahouse.com">우아빌라</a> ·
+      <a href="https://wooagongsi.wooahouse.com">우아공시가</a> ·
+      <a href="https://wooatown.wooahouse.com">우아동네</a> ·
+      <a href="{{ '/privacy/' | relative_url }}">개인정보처리방침</a>
+    </p>
+    <p class="copyright">&copy; 2026 우아땅값 · WooaHouse. All rights reserved.</p>
+  </div>
+</footer>
+
+</body>
+</html>
